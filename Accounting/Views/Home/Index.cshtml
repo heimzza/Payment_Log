@@ -1,0 +1,564 @@
+﻿@{
+    ViewData["Title"] = "Accounting";
+}
+<head>
+    @*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">*@
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Accounting</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://kit.fontawesome.com/1636875ff8.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
+
+<style>
+
+    .customList {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: center;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+    }
+
+    .customListColumn {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-content: center;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 15px;
+    }
+
+    input, input:focus {
+        border: none !important;
+        border-width: 0px;
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+        input:focus {
+            border-width: 0px;
+            border: 0;
+            -webkit-appearance: none
+        }
+
+        input:hover {
+            background-color: #cac5c5;
+            opacity: .8;
+        }
+
+    button {
+        padding: 5px;
+        margin: 5px;
+    }
+
+    .padding_sm {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .fa, .fa-solid {
+        color: white;
+    }
+
+    .backgroundIcon {
+        padding: 5px;
+        background-color: green;
+        border-radius: 4px;
+    }
+
+    .btnPrimary {
+        background-color: #cac5c5;
+        color: green;
+        border: none;
+        border-radius: 10px;
+        box-shadow: none;
+    }
+
+        .btnPrimary:hover {
+            opacity: .5;
+        }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Header */
+    .modal-header {
+      padding: 2px 16px;
+    }
+    
+    /* Modal Body */
+    .modal-body {padding: 2px 16px;}
+    
+    /* Modal Footer */
+    .modal-footer {
+      padding: 2px 16px;
+    }
+    
+    /* Modal Content */
+    .modal-content {
+      position: relative;
+      background-color: #fefefe;
+      margin: auto;
+      padding: 0;
+      border: 1px solid #888;
+      width: 33%;
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+      animation-name: animatetop;
+      animation-duration: 0.4s
+    }
+    
+    /* Add Animation */
+    @@keyframes animatetop {
+      from {top: -300px; opacity: 0}
+      to {top: 0; opacity: 1}
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    .modal-header .close {
+        padding: 0px;
+        margin: 0px;
+    }
+
+    .margin_to_sm {
+        margin-top: 10px;
+    }
+
+    .borderBottomCustom {
+        border-bottom-width: 5px;
+        border-bottom-color: black;
+        border-bottom-style: double;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+    }
+</style>
+
+<div class="container">
+    <main role="main" class="pb-3">
+        <div class="text-center">
+            <div class="customListColumn">
+                <h1 class="display-4">Payment Log</h1>
+                <div class="borderBottomCustom" style="display: flex; width: 500px; justify-content: flex-end;">
+                    <button onclick="saveToFile();" class="col-3 btnPrimary" style="color: black;"><i class="fa fa-save" style="color: black;"></i> Save</button>
+                    <button onclick="loadFromFile();" class="col-3 btnPrimary" style="color: black;"><i class="fa fa-download" style="color: black;"></i> Load</button>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div class="customList" style="justify-content: flex-end;">
+                    <div style="display: flex; width: 500px; justify-content: flex-end; }">
+                        <button onclick="openModalAdd();" class="col-3 btnPrimary"><i class="fa fa-add" style="color: green;"></i> Add</button>
+                        <button onclick="openModalRemove();" class="col-3 btnPrimary" style="color: red;"><i class="fa fa-remove" style="color: red;"></i> Remove</button>
+                    </div>
+                </div>
+                <form id="myForm">
+                    <div class="list-group" style="width:500px;">
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="backgroundIcon">
+                                    <i class="fa-solid fa-coins fa-fw"></i>
+                                </div>&nbsp; Salary
+                            </div>
+                            <div>
+                                <span>$</span>
+                                <input type="text" id="Salary" name="Salary" placeholder="0" onchange="inputChange('Salary');">
+                            </div>
+                        </div>
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="backgroundIcon" style="background-color:deepskyblue;">
+                                    <i class="fa fa-car fa-fw"></i>
+                                </div>&nbsp; Car
+                            </div>
+                            <div>
+                                <span>- $</span>
+                                <input type="text" id="Car" name="Car" placeholder="0" onchange="inputChange('Car');">
+                            </div>
+                        </div>
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="customList">
+                                    <div class="backgroundIcon" style="background-color:gray;">
+                                        <i class="fa-solid fa-cart-shopping fa-fw"></i>
+                                    </div>&nbsp; Clothing
+                                </div>
+                            </div>
+                            <div>
+                                <span>- $</span>
+                                <input type="text" id="Clothing" name="Clothing" placeholder="0" onchange="inputChange('Clothing');">
+                            </div>
+                        </div>
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="customList">
+                                    <div class="backgroundIcon" style="background-color:mediumpurple;">
+                                        <i class="fa-solid fa-apple-whole fa-fw"></i>
+                                    </div>&nbsp; Food
+                                </div>
+                            </div>
+                            <div>
+                                <span>- $</span>
+                                <input type="text" id="Food" name="Food" placeholder="0" onchange="inputChange('Food');">
+                            </div>
+                        </div>
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="customList">
+                                    <div class="backgroundIcon" style="background-color:orangered;">
+                                        <i class="fa fa-coffee fa-fw"></i>
+                                    </div>&nbsp; Leisure
+                                </div>
+                            </div>
+                            <div>
+                                <span>- $</span>
+                                <input type="text" id="Leisure" name="Leisure" placeholder="0" onchange="inputChange('Leisure');">
+                            </div>
+                        </div>
+                        <div class="list-group-item customList">
+                            <div class="customList">
+                                <div class="customList">
+                                    <div class="backgroundIcon" style="background-color:black;">
+                                        <i class="fa fa-home fa-fw"></i>
+                                    </div>&nbsp; Living
+                                </div>
+                            </div>
+                            <div>
+                                <span>- $</span>
+                                <input type="text" id="Living" name="Living" placeholder="0" onchange="inputChange('Living');">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Add Modal -->
+<div id="myModalAdd" class="modal">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="margin_to_sm" >Add Payment</h4>
+            <span onclick="closeModalAdd();" class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <input class="margin_to_sm" type="text" id="inputAddPayment" name="InputAddPayment" placeholder="0">
+            <div class="margin_to_sm">
+                <label for="paymentType">Choose a payment type:</label>
+
+                <select name="paymentTypeAdd" id="paymentTypeAdd">
+                    <option value="">None</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Car">Car</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Food">Food</option>
+                    <option value="Leisure">Leisure</option>
+                    <option value="Living">Living</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="addPayment();" class="btnPrimary padding_sm" style="width: auto;">Add</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Remove Modal -->
+<div id="myModalRemove" class="modal">
+
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4>Remove Payment</h4>
+            <span onclick="closeModalRemove();" class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <input type="text" id="inputRemovePayment" name="InputRemovePayment" placeholder="0">
+            <div class="margin_to_sm">
+                <label for="paymentType">Choose a payment type:</label>
+
+                <select name="paymentTypeRemove" id="paymentTypeRemove">
+                    <option value="">None</option>
+                    <option value="Salary">Salary</option>
+                    <option value="Car">Car</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Food">Food</option>
+                    <option value="Leisure">Leisure</option>
+                    <option value="Living">Living</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button onclick="removePayment();" class="btnPrimary padding_sm" style="color: red; width: auto;">Remove</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+    function saveToFile() {
+        //var data = $("#myForm").serialize();
+        var data = new FormData();
+        data.append('Salary', salaryValue);
+        data.append('Car', carValue);
+        data.append('Clothing', clothingValue);
+        data.append('Food', foodValue);
+        data.append('Leisure', leisureValue);
+        data.append('Living', livingValue);
+        //console.log(data);
+        //alert(data);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/SaveToFile',
+            processData: false,
+            contentType: false,
+            data: data,
+            success: function (result) {
+                alert('Data saved successfully!');
+                console.log(result);
+            },
+            error: function () {
+                alert('Data save failed!');
+                console.log('Failed ');
+            }
+        })
+    }
+    
+    function loadFromFile() {
+        var data = $("#myForm").serialize();
+        //console.log(data);
+        //alert(data);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/LoadFromFile',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8', // when we use .serialize() this generates the data in query string format. this needs the default contentType (default content type is: contentType: 'application/x-www-form-urlencoded; charset=UTF-8') so it is optional, you can remove it
+            data: data,
+            success: function (result) {
+                if (result.error) {
+                    alert('Data loaded successfully!');
+                    console.log('Failed ');
+                } else {
+                    $('#Salary').val(result.payList.salary);
+                    salaryValue = result.payList.salary;
+                    $('#Car').val(result.payList.car);
+                    carValue = result.payList.car;
+                    $('#Clothing').val(result.payList.clothing);
+                    clothingValue = result.payList.clothing;
+                    $('#Food').val(result.payList.food);
+                    foodValue = result.payList.food;
+                    $('#Leisure').val(result.payList.leisure);
+                    leisureValue = result.payList.leisure;
+                    $('#Living').val(result.payList.living);
+                    livingValue = result.payList.living;
+                    alert('Data loaded successfully!');
+                    console.log(result);
+                }
+            },
+            error: function () {
+                alert('Data load failed!');
+                console.log('Failed ');
+            }
+        })
+    }
+
+    var salaryValue = 0, carValue = 0, clothingValue = 0, foodValue = 0, leisureValue = 0, livingValue = 0;
+
+    var modalAdd = document.getElementById("myModalAdd");
+    var modalRemove = document.getElementById("myModalRemove");
+
+    window.onclick = function (event) {
+        if (event.target == modalAdd) {
+            modalAdd.style.display = "none";
+        }
+    }
+
+    function openModalAdd() {
+        modalAdd.style.display = "block";
+    }
+
+    function closeModalAdd() {
+        modalAdd.style.display = "none";
+    }
+
+    function openModalRemove() {
+        modalRemove.style.display = "block";
+    }
+
+    function closeModalRemove() {
+        modalRemove.style.display = "none";
+    }
+
+    //function isNumeric(str) {
+    //    if (typeof str != "string") return false // we only process strings!
+    //    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+    //        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+    //}
+
+    function inputChange(type) {
+        if (type == "Salary") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(salaryValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            salaryValue = value;
+            $("#" + type).val(Number(salaryValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Car") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(carValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            carValue = value;
+            $("#" + type).val(Number(carValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Clothing") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(clothingValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            clothingValue = value;
+            $("#" + type).val(Number(clothingValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Food") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(foodValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            foodValue = value;
+            $("#" + type).val(Number(foodValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Leisure") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(leisureValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            leisureValue = value;
+            $("#" + type).val(Number(leisureValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Living") {
+            var value = parseFloat($("#" + type).val());
+            if (isNaN(value) || value < 0) {
+                $("#" + type).val(Number(livingValue.toFixed(2)).toLocaleString('en-US'));
+                return alert("Please type valid numbers");
+            }
+            livingValue = value;
+            $("#" + type).val(Number(livingValue.toFixed(2)).toLocaleString('en-US'));
+
+        }
+    }
+
+    function addPayment() {
+        var value = document.getElementById("inputAddPayment").value;
+        var type = document.getElementById("paymentTypeAdd").value;
+
+        if (isNaN(parseFloat(value))) {
+            return alert("Please insert only numbers");
+        }
+
+        if (type == "" || type == undefined) {
+            return alert("Please select a type");
+        }
+
+        changeValue(value, type);
+    }
+
+    function removePayment() {
+        var value = document.getElementById("inputRemovePayment").value;
+        var type = document.getElementById("paymentTypeRemove").value;
+
+        value = parseFloat(value);
+
+        if (isNaN(value)) {
+            return alert("Please insert only numbers");
+        }
+
+        if (type == "" || type == undefined) {
+            return alert("Please select a type");
+        }
+
+        changeValue(value * -1, type);
+    }
+
+    function changeValue(value, type) {
+        value = parseFloat(value);
+        if (type == "Salary") {
+            if ((salaryValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            salaryValue += value;
+            $("#" + type).val(Number(salaryValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Car") {
+            if ((carValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            carValue += value;
+            $("#" + type).val(Number(carValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Clothing") {
+            if ((clothingValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            clothingValue += value;
+            $("#" + type).val(Number(clothingValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Food") {
+            if ((foodValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            foodValue += value;
+            $("#" + type).val(Number(foodValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Leisure") {
+            if ((leisureValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            leisureValue += value;
+            $("#" + type).val(Number(leisureValue.toFixed(2)).toLocaleString('en-US'));
+
+        } else if (type == "Living") {
+            if ((livingValue + value) < 0) {
+                return alert("Input amount is bigger than its total amount");
+            }
+            livingValue += value;
+            $("#" + type).val(Number(livingValue.toFixed(2)).toLocaleString('en-US'));
+
+        }
+    }
+
+</script>
